@@ -2,10 +2,7 @@ package myDemoqaComTest;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.assertj.core.api.Assertions;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
@@ -27,10 +24,7 @@ public class FirstTestClass {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("https://demoqa.com/");
-        WebElement elementElement = driver.findElement(By.xpath("//*[text()='Elements']/.."));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElement);
-        elementElement.click();
-        newWait();
+
     }
 
     public void newWait() {
@@ -51,6 +45,10 @@ public class FirstTestClass {
         String expectedResultCurrentAddress = "Vinn";
         String expectedResultPermanentAddress = "Ukr";
 
+        WebElement elementElements = driver.findElement(By.xpath("//*[text()='Elements']/.."));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElements);
+        elementElements.click();
+        newWait();
         driver.findElement(By.xpath("//span[text()='Text Box']")).click();
         newWait();
         driver.findElement(By.id("userName")).sendKeys(expectedResultName);
@@ -89,6 +87,10 @@ public class FirstTestClass {
         String expectedResultSelected = "You have selected :";
         String expectedResultWordElement = "wordFile";
 
+        WebElement elementElements = driver.findElement(By.xpath("//*[text()='Elements']/.."));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElements);
+        elementElements.click();
+        newWait();
         driver.findElement(By.xpath("//*[text()='Elements']/..")).click();
         newWait();
         driver.findElement(By.xpath("//span[text()='Check Box']")).click();
@@ -119,8 +121,12 @@ public class FirstTestClass {
         String expectedResultRightClickMe = "You have done a right click";
         String expectedResultDoubleClick = "You have done a double click";
 
-        driver.findElement(By.xpath("//*[text()='Elements']/..")).click();
+        WebElement elementElements = driver.findElement(By.xpath("//*[text()='Elements']/.."));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElements);
+        elementElements.click();
         newWait();
+        /*driver.findElement(By.xpath("//*[text()='Elements']/..")).click();
+        newWait();*/
 
         WebElement elementButtons = driver.findElement(By.id("item-4"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementButtons);
@@ -157,8 +163,32 @@ public class FirstTestClass {
         Assertions.assertThat(actualResultDoubleClick).as("Expected text "+expectedResultDoubleClick+" not exist on the Page")
                 .isEqualTo(expectedResultDoubleClick);
 
+    }
+    @Test(priority = 4)
+    public void checkOpenedFrameWithText() {
+        String expectedResultInNewTab = "This is sample page";
+
+        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
+        elementAlert.click();
+        newWait();
+        driver.findElement(By.xpath("//span[text()='Browser Windows']")).click();
+        newWait();
+        driver.findElement(By.id("tabButton")).click();
+        newWait();
+
+        String selectLinkOpenInNewTab = Keys.chord(Keys.CONTROL,Keys.RETURN);
+        driver.findElement(By.linkText("https://demoqa.com/sample")).sendKeys(selectLinkOpenInNewTab);
+
+        WebElement inNewTab = driver.findElement(By.id("sampleHeading"));
+        String actualResultInNewTab = inNewTab.getText();
+        Assertions.assertThat(actualResultInNewTab).as("Expected text "+expectedResultInNewTab+" not exist on the Page")
+                .isEqualTo(actualResultInNewTab);
+
+
 
     }
+
     @AfterMethod(alwaysRun = true)
     public void quitDriver() {
         driver.quit();
