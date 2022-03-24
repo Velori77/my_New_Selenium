@@ -131,6 +131,7 @@ public class FirstTestClass {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementClickMe);
         elementClickMe.click();
         newWait();
+        // I think mistakes are here!
 
         Actions actions = new Actions(driver);
         WebElement elementRightClick = driver.findElement(By.id("rightClickBtn"));
