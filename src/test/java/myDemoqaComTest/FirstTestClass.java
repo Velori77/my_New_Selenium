@@ -31,13 +31,6 @@ public class FirstTestClass {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElement);
         elementElement.click();
         newWait();
-        /*JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollBy(0,150)", "");
-        driver.findElement(By.xpath("//*[text()='Elements']/..")).click();
-        newWait();
-
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
-        */
     }
 
     public void newWait() {
@@ -73,8 +66,7 @@ public class FirstTestClass {
         String actualResultName = Name.getText();
 
         Assert.assertEquals(actualResultName,"Name:"+ expectedResultName);
-        /*Assertions.assertThat(actualResultName).as("Expected text "+expectedResultName+" not exist on the Page")
-                .isEqualTo(expectedResultName);*/
+
 
 
         WebElement Email = driver.findElement(By.id("email"));
@@ -89,8 +81,6 @@ public class FirstTestClass {
         String actualResultPermanentAddress = PermanentAddress.getText();                                             
         Assert.assertEquals(actualResultPermanentAddress,"Permananet Address :"+ expectedResultPermanentAddress);
 
-        //Assertions.assertThat(actualResult).as("Expected text "+expectedResultName+" not exist on the Page")
-                //.isEqualTo(expectedResultName);
 
     }
 
