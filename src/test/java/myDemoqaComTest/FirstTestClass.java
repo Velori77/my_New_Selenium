@@ -5,6 +5,8 @@ import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -133,12 +135,13 @@ public class FirstTestClass {
         elementButtons.click();
         newWait();
 
+        // I think mistakes are here!
         WebElement elementClickMe = driver.findElement(By.xpath("//button[@id='83PSV']/.."));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementClickMe);
         elementClickMe.click();
         newWait();
-        // I think mistakes are here!
 
+        // Or here!
         Actions actions = new Actions(driver);
         WebElement elementRightClick = driver.findElement(By.id("rightClickBtn"));
         actions.contextClick(elementRightClick).perform();
@@ -177,6 +180,7 @@ public class FirstTestClass {
         driver.findElement(By.id("tabButton")).click();
         newWait();
 
+        //No clear for me!
         String selectLinkOpenInNewTab = Keys.chord(Keys.CONTROL,Keys.RETURN);
         driver.findElement(By.linkText("https://demoqa.com/sample")).sendKeys(selectLinkOpenInNewTab);
 
@@ -188,6 +192,45 @@ public class FirstTestClass {
 
 
     }
+
+    @Test(priority = 5)
+    public void checkAlertDisappear() {
+        String expectedResultOpenedText = "You clicked a button";
+
+        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
+        elementAlert.click();
+        newWait();
+        driver.findElement(By.xpath("//div[@class='element-list collapse show']//li[@id='item-1']")).click();
+        newWait();
+        driver.findElement(By.xpath("//button[@id='alertButton']")).click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.alertIsPresent());
+
+
+        /*driver.switchTo().frame(name_or_id);*///Not clear for me!
+
+    }
+    @Test(priority = 6)
+    public void checkAlertAppearanceAfterWaiting() {
+
+        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
+        elementAlert.click();
+        //driver.findElement(By.xpath())
+    }
+
+    @Test(priority = 7)
+        public void checkingExistingInBigSquare() {
+
+        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
+        elementAlert.click();
+
+    }
+
+
 
     @AfterMethod(alwaysRun = true)
     public void quitDriver() {
