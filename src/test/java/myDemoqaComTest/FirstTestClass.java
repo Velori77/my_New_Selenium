@@ -1,9 +1,10 @@
 package myDemoqaComTest;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.assertj.core.api.Assertions;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -11,230 +12,314 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.testng.asserts.Assertion;
+import utils.JsExecutor;
 
-import javax.naming.Name;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import static utils.Drivers.getChromeDriver;
+import static utils.Drivers.quiteWebDriver;
 
 public class FirstTestClass {
 
     private WebDriver driver;
+    private JsExecutor jsExecutor;
+    private WebDriverWait waiter;
 
     @BeforeMethod
-    public void setUpBrowser() {
-        WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
+    public void openPage() {
+        driver = getChromeDriver();
+        jsExecutor = new JsExecutor(driver);
+        waiter = new WebDriverWait(driver, Duration.ofSeconds(20));
         driver.get("https://demoqa.com/");
-
     }
-
-    public void newWait() {
-        try {
-            Thread.sleep(500);
-        }
-        catch (InterruptedException e) {
-
-            e.printStackTrace();
-        }
-    }
-
 
     @Test(priority = 1)
-    public void checkConformityInputsDataOnThePage() {
+    public void checkConformityInputsDataOnThePageTest() {
         String expectedResultName = "Vasilii Brovkin";
         String expectedResultEmail = "vb@ua.com";
         String expectedResultCurrentAddress = "Vinn";
         String expectedResultPermanentAddress = "Ukr";
 
         WebElement elementElements = driver.findElement(By.xpath("//*[text()='Elements']/.."));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElements);
+        jsExecutor.scrollIntoView(elementElements);
         elementElements.click();
-        newWait();
         driver.findElement(By.xpath("//span[text()='Text Box']")).click();
-        newWait();
         driver.findElement(By.id("userName")).sendKeys(expectedResultName);
         driver.findElement(By.id("userEmail")).sendKeys(expectedResultEmail);
         driver.findElement(By.id("currentAddress")).sendKeys(expectedResultCurrentAddress);
         driver.findElement(By.id("permanentAddress")).sendKeys(expectedResultPermanentAddress);
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollBy(0,250)", "");
-        driver.findElement(By.id("submit")).click();
-        newWait();
+        WebElement submitButton = driver.findElement(By.id("submit"));
+        jsExecutor.scrollIntoView(submitButton);
+
+        submitButton.click();
 
         WebElement Name = driver.findElement(By.id("name"));
         String actualResultName = Name.getText();
 
-        Assert.assertEquals(actualResultName,"Name:"+ expectedResultName);
-
+        Assert.assertEquals(actualResultName, "Name:" + expectedResultName);
 
 
         WebElement Email = driver.findElement(By.id("email"));
         String actualResultEmail = Email.getText();
-        Assert.assertEquals(actualResultEmail,"Email:"+ expectedResultEmail);
+        Assert.assertEquals(actualResultEmail, "Email:" + expectedResultEmail);
 
         WebElement CurrentAddress = driver.findElement(By.xpath("//p[@id='currentAddress']"));
         String actualResultCurrentAddress = CurrentAddress.getText();
-        Assert.assertEquals(actualResultCurrentAddress,"Current Address :"+ expectedResultCurrentAddress);
+        Assert.assertEquals(actualResultCurrentAddress, "Current Address :" + expectedResultCurrentAddress);
 
         WebElement PermanentAddress = driver.findElement(By.xpath("//p[@id='permanentAddress']"));
-        String actualResultPermanentAddress = PermanentAddress.getText();                                             
-        Assert.assertEquals(actualResultPermanentAddress,"Permananet Address :"+ expectedResultPermanentAddress);
+        String actualResultPermanentAddress = PermanentAddress.getText();
+        Assert.assertEquals(actualResultPermanentAddress, "Permananet Address :" + expectedResultPermanentAddress);
 
 
     }
 
     @Test(priority = 2)
-    public void checkSelectionWordFileOnTheCheckBoxPage() {
+    public void checkSelectionWordFileOnTheCheckBoxPageTest() {
         String expectedResultSelected = "You have selected :";
         String expectedResultWordElement = "wordFile";
 
         WebElement elementElements = driver.findElement(By.xpath("//*[text()='Elements']/.."));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElements);
+        jsExecutor.scrollIntoView(elementElements);
         elementElements.click();
-        newWait();
+
         driver.findElement(By.xpath("//*[text()='Elements']/..")).click();
-        newWait();
         driver.findElement(By.xpath("//span[text()='Check Box']")).click();
-        newWait();
         driver.findElement(By.xpath("//*[text()='Home']/../../button")).click();
-        newWait();
         driver.findElement(By.xpath("//*[text()='Downloads']/../../button")).click();
-        newWait();
         driver.findElement(By.xpath("//span[text()='Word File.doc']")).click();
-        newWait();
 
         WebElement Selected = driver.findElement(By.xpath("//span[text()='You have selected :']"));
         String actualResultSelected = Selected.getText();
-        Assertions.assertThat(actualResultSelected).as("Expected text "+expectedResultSelected+" not exist on the Page")
+        Assertions.assertThat(actualResultSelected).as("Expected text " + expectedResultSelected + " not exist on the Page")
                 .isEqualTo(expectedResultSelected);
 
         WebElement WordElement = driver.findElement(By.xpath("//span[@class='text-success']"));
         String actualResultWordElement = WordElement.getText();
-        Assertions.assertThat(actualResultWordElement).as("Expected text "+expectedResultWordElement+" not exist on the Page")
+        Assertions.assertThat(actualResultWordElement).as("Expected text " + expectedResultWordElement + " not exist on the Page")
                 .isEqualTo(expectedResultWordElement);
 
-
-
     }
+
     @Test(priority = 3)
-    public void checkExistDynamicClick() {
+    public void checkAppearsTextInVariableDynamicClickTest() {
         String expectedResultClickMe = "You have done a dynamic click";
         String expectedResultRightClickMe = "You have done a right click";
         String expectedResultDoubleClick = "You have done a double click";
 
         WebElement elementElements = driver.findElement(By.xpath("//*[text()='Elements']/.."));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementElements);
+        jsExecutor.scrollIntoView(elementElements);
         elementElements.click();
-        newWait();
-        /*driver.findElement(By.xpath("//*[text()='Elements']/..")).click();
-        newWait();*/
 
         WebElement elementButtons = driver.findElement(By.id("item-4"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementButtons);
+        jsExecutor.scrollIntoView(elementButtons);
         elementButtons.click();
-        newWait();
 
-        // I think mistakes are here!
-        WebElement elementClickMe = driver.findElement(By.xpath("//button[@id='83PSV']/.."));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementClickMe);
+        WebElement elementClickMe = driver.findElement(By.xpath("//button[text()='Click Me']"));
+        jsExecutor.scrollIntoView(elementClickMe);
         elementClickMe.click();
-        newWait();
 
-        // Or here!
         Actions actions = new Actions(driver);
         WebElement elementRightClick = driver.findElement(By.id("rightClickBtn"));
-        actions.contextClick(elementRightClick).perform();
-        newWait();
-        WebElement elementDoubleClick = driver.findElement(By.id("doubleClickBtn"));
-        actions.doubleClick(elementDoubleClick).perform();;
-        newWait();
+        actions.contextClick(elementRightClick).build().perform();
 
+        WebElement elementDoubleClick = driver.findElement(By.id("doubleClickBtn"));
+        actions.doubleClick(elementDoubleClick).build().perform();
 
         WebElement ClickMe = driver.findElement(By.id("dynamicClickMessage"));
         String actualResultClickMe = ClickMe.getText();
-        Assertions.assertThat(actualResultClickMe).as("Expected text "+expectedResultClickMe+" not exist on the Page")
+        Assertions.assertThat(actualResultClickMe).as("Expected text " + expectedResultClickMe + " not exist on the Page")
                 .isEqualTo(expectedResultClickMe);
 
-        WebElement RightClickMe = driver.findElement(By.id("rightClickMessage"));
-        String actualResultRightClickMe = RightClickMe.getText();
-        Assertions.assertThat(actualResultRightClickMe).as("Expected text "+expectedResultRightClickMe+" not exist on the Page")
+        WebElement rightClickMe = driver.findElement(By.id("rightClickMessage"));
+        String actualResultRightClickMe = rightClickMe.getText();
+        Assertions.assertThat(actualResultRightClickMe).as("Expected text " + expectedResultRightClickMe + " not exist on the Page")
                 .isEqualTo(expectedResultRightClickMe);
 
-        WebElement DoubleClick = driver.findElement(By.id("doubleClickMessage"));
-        String actualResultDoubleClick = DoubleClick.getText();
-        Assertions.assertThat(actualResultDoubleClick).as("Expected text "+expectedResultDoubleClick+" not exist on the Page")
+        WebElement doubleClick = driver.findElement(By.id("doubleClickMessage"));
+        String actualResultDoubleClick = doubleClick.getText();
+        Assertions.assertThat(actualResultDoubleClick).as("Expected text " + expectedResultDoubleClick + " not exist on the Page")
                 .isEqualTo(expectedResultDoubleClick);
 
     }
+
     @Test(priority = 4)
-    public void checkOpenedFrameWithText() {
-        String expectedResultInNewTab = "This is sample page";
+    public void checkOpenedFrameWithTextTest() {
+        String expectedResultInNewWindow = "This is a sample page";
+        WebElement webElement = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
 
-        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
-        elementAlert.click();
-        newWait();
+        jsExecutor.scrollIntoView(webElement);
+        webElement.click();
         driver.findElement(By.xpath("//span[text()='Browser Windows']")).click();
-        newWait();
         driver.findElement(By.id("tabButton")).click();
-        newWait();
+        List<String> windows = new ArrayList(driver.getWindowHandles());
+        driver.switchTo().window(windows.get(1));
+        String actualResultInNewWindow = driver.findElement(By.id("sampleHeading")).getText();
 
-        //No clear for me!
-        String selectLinkOpenInNewTab = Keys.chord(Keys.CONTROL,Keys.RETURN);
-        driver.findElement(By.linkText("https://demoqa.com/sample")).sendKeys(selectLinkOpenInNewTab);
-
-        WebElement inNewTab = driver.findElement(By.id("sampleHeading"));
-        String actualResultInNewTab = inNewTab.getText();
-        Assertions.assertThat(actualResultInNewTab).as("Expected text "+expectedResultInNewTab+" not exist on the Page")
-                .isEqualTo(actualResultInNewTab);
-
-
-
+        Assertions.assertThat(expectedResultInNewWindow).as("Expected text " + expectedResultInNewWindow + " not exist on the Page")
+                .isEqualTo(actualResultInNewWindow);
     }
 
     @Test(priority = 5)
-    public void checkAlertDisappear() {
+    public void checkAlertDisappearTest() {
         String expectedResultOpenedText = "You clicked a button";
+        WebElement webElement = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
 
-        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
-        elementAlert.click();
-        newWait();
-        driver.findElement(By.xpath("//div[@class='element-list collapse show']//li[@id='item-1']")).click();
-        newWait();
-        driver.findElement(By.xpath("//button[@id='alertButton']")).click();
+        jsExecutor.scrollIntoView(webElement);
+        webElement.click();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.alertIsPresent());
+        //Click Alerts
+        driver.findElement(By.xpath("//span[text()='Alerts']")).click();
+        //Click button Click Me
 
+        By by = By.id("alertButton");
+        waiter.until(ExpectedConditions.presenceOfElementLocated(by));
+        driver.findElement(by).click();
+        waiter.until(ExpectedConditions.alertIsPresent());
 
-        /*driver.switchTo().frame(name_or_id);*///Not clear for me!
+        Alert alert = driver.switchTo().alert();
+        String actualResultOpenedText = alert.getText();
+
+        Assertions.assertThat(expectedResultOpenedText).as("Expected text " + expectedResultOpenedText + " not exist on the Page")
+                .isEqualTo(actualResultOpenedText);
 
     }
-    @Test(priority = 6)
-    public void checkAlertAppearanceAfterWaiting() {
 
-        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
-        elementAlert.click();
-        //driver.findElement(By.xpath())
+    @Test(priority = 6)
+    public void checkAlertAppearanceAfterWaitingTest() {
+        String expectedResultOpenedText = "This alert appeared after 5 seconds";
+        WebElement webElement = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+
+        jsExecutor.scrollIntoView(webElement);
+        webElement.click();
+
+        //Click Alerts
+        By byAlerts = By.xpath("//span[text()='Alerts']");
+        waiter.until(ExpectedConditions.presenceOfElementLocated(byAlerts));
+        driver.findElement(byAlerts).click();
+
+        //Click button Click Me
+        By by = By.id("timerAlertButton");
+        waiter.until(ExpectedConditions.presenceOfElementLocated(by));
+        driver.findElement(by).click();
+        waiter.until(ExpectedConditions.alertIsPresent());
+
+        Alert alert = driver.switchTo().alert();
+        String actualResultOpenedText = alert.getText();
+
+        Assertions.assertThat(expectedResultOpenedText).as("Expected text " + expectedResultOpenedText + " not exist on the Page")
+                .isEqualTo(actualResultOpenedText);
     }
 
     @Test(priority = 7)
-        public void checkingExistingInBigSquare() {
+    public void checkingExistingInBigSquareTest() {
+        String expectedResultOpenedText = "This is a sample page";
 
-        WebElement elementAlert = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elementAlert);
-        elementAlert.click();
+        WebElement webElement = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+
+        jsExecutor.scrollIntoView(webElement);
+        webElement.click();
+
+        //Click Frames
+        By byFrames = By.xpath("//span[text()='Frames']");
+        waiter.until(ExpectedConditions.presenceOfElementLocated(byFrames));
+        driver.findElement(byFrames).click();
+
+        //Switch to iFrame
+        WebElement iFrame = driver.findElement(By.id("frame1"));
+        driver.switchTo().frame(iFrame);
+        String actualResultOpenedText = driver.findElement(By.id("sampleHeading")).getText();
+
+        Assertions.assertThat(actualResultOpenedText).isEqualTo(expectedResultOpenedText);
 
     }
 
+    @Test(priority = 8)
+    public void checkAppearanceAndDisappearanceModalTest() {
+        String expectedResultTitleSmallModal = "Small Modal";
+        String expectedResultTextSmallModal = "This is a small modal. It has very less content";
+
+        WebElement webElement = driver.findElement(By.xpath("//h5[text()='Alerts, Frame & Windows']"));
+
+        jsExecutor.scrollIntoView(webElement);
+        webElement.click();
+
+        //Click Modal Dialogs
+        By byModalDialogs = By.xpath("//span[text()='Modal Dialogs']");
+        waiter.until(ExpectedConditions.presenceOfElementLocated(byModalDialogs)).click();
+
+        driver.findElement(By.id("showSmallModal")).click();
+
+        String actualSmallModal = driver.findElement(By.id("example-modal-sizes-title-sm")).getText();
+        Assertions.assertThat(actualSmallModal).isEqualTo(expectedResultTitleSmallModal);
+
+        String actualBodyText = driver.findElement(By.className("modal-body")).getText();
+        Assertions.assertThat(actualBodyText).isEqualTo(expectedResultTextSmallModal);
+
+        //Click Close
+        driver.findElement(By.id("closeSmallModal")).click();
+
+        By modalWindow = By.xpath("//div[@role='dialog']");
+        waiter.until(ExpectedConditions.numberOfElementsToBe(modalWindow, 0));
+        Assertions.assertThat(driver.findElements(modalWindow).size()).isEqualTo(0);
+
+    }
+
+    @Test(priority = 9)
+    public void checkFillingAndDevastationProgressBarTest() {
+        String expectedResultHighProgressBar = "100%";
+        String expectedResultLowProgressBar = "0%";
+
+        //Scroll and Click Widgets
+        WebElement elementWidgets = driver.findElement(By.xpath("//h5[text()='Widgets']"));
+        jsExecutor.scrollIntoView(elementWidgets);
+        elementWidgets.click();
+        //Scroll and Click Progress Bar
+        WebElement elementProgressBar = driver.findElement(By.xpath("//span[text()='Progress Bar']"));
+        jsExecutor.scrollIntoView(elementProgressBar);
+        elementProgressBar.click();
+        //Click Start
+        driver.findElement(By.id("startStopButton")).click();
+        waiter.until(ExpectedConditions.presenceOfElementLocated(By.id("resetButton")));
+
+        By byXpath = By.xpath("//div[@role='progressbar']");
+        String progressHighBarText = driver.findElement(byXpath).getText();
+        Assertions.assertThat(progressHighBarText).isEqualTo(expectedResultHighProgressBar);
+        //Click Reset
+        driver.findElement(By.id("resetButton")).click();
+        String progressLowBarText = driver.findElement(byXpath).getText();
+        Assertions.assertThat(progressLowBarText).isEqualTo(expectedResultLowProgressBar);
+
+    }
+
+    @Test(priority = 10)
+    public void checkActivenessAndInactivenessTabsTest() {
+        List<WebElement> activeListElements = new ArrayList<>();
+        List<WebElement> inactiveListElements = new ArrayList<>();
+
+        //Scroll and Click Widgets
+        WebElement elementWidgets = driver.findElement(By.xpath("//h5[text()='Widgets']"));
+        jsExecutor.scrollIntoView(elementWidgets);
+        elementWidgets.click();
+        //Scroll and Click Tabs
+        WebElement elementTabs = driver.findElement(By.xpath("//span[text()='Tabs']"));
+        jsExecutor.scrollIntoView(elementTabs);
+        elementTabs.click();
+        // need to resolve
+        /*List<WebElement> allTabs = driver.findElements(By.cssSelector("[role='tab']"));
+        for (WebElement webElement : allTabs) {
+            if
+        }*/
+
+
+    }
 
 
     @AfterMethod(alwaysRun = true)
     public void quitDriver() {
-        driver.quit();
+        quiteWebDriver();
     }
 }
 
